@@ -95,3 +95,25 @@ export const spyOn = (object, methodName) => {
 
   return object[methodName]
 }
+
+export const spyOnGetter = (object, methodName) => {
+  const original = object[methodName]
+
+  if (!isSpy(original)) {
+    assert(
+      isFunction(original),
+      'Cannot spyOn the %s property; it is not a function',
+      methodName
+    )
+
+    Object.defineProperty(object, methodName, {
+      get: createSpy(original, () => {
+        Object.defineProperty(object, methodName, {
+          value: original
+        })
+      })
+    })
+  }
+
+  return object[methodName]
+}
